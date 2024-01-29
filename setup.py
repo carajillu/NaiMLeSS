@@ -3,7 +3,7 @@ from pathlib import Path
 
 # see https://packaging.python.org/guides/single-sourcing-package-version/
 version_dict = {}
-with open(Path(__file__).parents[0] / "cp2k-ml-workflows/_version.py") as fp:
+with open(Path(__file__).parents[0] / "cp2k_ml_workflows/_version.py") as fp:
     exec(fp.read(), version_dict)
 version = version_dict["__version__"]
 del version_dict
@@ -15,10 +15,12 @@ setup(
     download_url="https://github.com/carajillu/cp2k_ml_workflows/",
     author="Joan Clark-Nicolas",
     python_requires=">=3.7",
-    packages=find_packages(include=["cp2k-ml-workflows", "cp2k-ml-workflows.*"]),
+    packages=find_packages(include=["cp2k_ml_workflows", "cp2k_ml_workflows.*"]),
     entry_points={
         # make the scripts available as command line scripts
-        "console_scripts": ["cp2k-ml-workflows = cp2k-ml-workflows.scripts.run:main"]
+        "console_scripts": [
+            "cp2k-ml-workflows = cp2k_ml_workflows.scripts.run:main",
+        ]
     },
     install_requires=[
         "numpy",
