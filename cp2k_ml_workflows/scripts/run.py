@@ -1,9 +1,82 @@
+import os
+import sys
+import argparse
+import yaml
+from cp2k_ml_workflows.checks import check_md_engines
+from cp2k_ml_workflows.checks import check_ml_tools
+
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-i",
+        "--input",
+        nargs="?",
+        help="Workflow configuration file (yaml)",
+        default="cfg.yml",
+    )
+    args = parser.parse_args()
+    return args
+
+
+def check_config(yml):
+    # Check outer keys
+    try:
+        datasets = yml["datasets"]
+        md_engine = yml["md_engine"]
+        models = yml["models"]
+        print("All keys located")
+    except Exception as error:
+        print(f"Missing outer key: {error}")
+        return False
+
+    # Check presence of datasets
+    if "training" not in datasets.keys():
+        print("You must specify a training data set")
+        return False
+    for key in datasets.keys():
+        if not os.path.isfile(datasets[key]):
+            print(f"Missing {key} dataset file: {datasets[key]}")
+            return False
+
+    # Check presence of MD engine
+    try:
+        check_md_engines.run_check.main(md_engine)
+    except Exception:
+        print(f"MD engine {md_engine} not supported")
+        return False
+
+    # Check presence of ML tools and ML config files
+
+    for key in models.keys():
+        try:
+            ml_tool = models[key]["engine"]
+            config = models[key]["config"]
+        except Exception as error:
+            print(f"Model {key}: missing keyword {error}")
+            return False
+
+        try:
+            check_ml_tools.run_check.main(ml_tool)
+        except Exception:
+            print(f"ML tool {ml_tool} not supported")
+            return False
+
+        if not os.path.isfile(config):
+            print(f"File {config} does not exist or is not accessible.")
+            return False
+
+    return True
+
+
 def main(running_as_script=False):
-    print("hello world")
-    if running_as_script:
-        print("running as script")
-    else:
-        print("not running as script")
+    args = parse_args()
+    with open(args.input, "r") as file:
+        yml = yaml.safe_load(file)
+        if not check_config(yml):
+            print("Check output for errors in config file. Exiting.")
+            sys.exit()
+
     return
 
 
