@@ -2,8 +2,8 @@ import os
 import sys
 import argparse
 import yaml
-from cp2k_ml_workflows.checks import check_md_engines
-from cp2k_ml_workflows.checks import check_ml_tools
+from cp2k_ml_workflows.checks.check_md_engines.run_check import main as check_md_engine
+from cp2k_ml_workflows.checks.check_ml_tools.run_check import main as check_ml_tool
 
 
 def parse_args():
@@ -40,12 +40,14 @@ def check_config(yml):
             return False
 
     # Check presence of MD engine
+    print("hello world")
     try:
-        check_md_engines.run_check.main(md_engine)
-    except Exception:
+        check_md_engine(md_engine)
+    except Exception as error:
+        print(error)
         print(f"MD engine {md_engine} not supported")
         return False
-
+    sys.exit()
     # Check presence of ML tools and ML config files
 
     for key in models.keys():
@@ -57,7 +59,7 @@ def check_config(yml):
             return False
 
         try:
-            check_ml_tools.run_check.main(ml_tool)
+            check_ml_tool(ml_tool)
         except Exception:
             print(f"ML tool {ml_tool} not supported")
             return False
