@@ -15,7 +15,9 @@ setup(
     download_url="https://github.com/carajillu/cp2k_ml_workflows/",
     author="Joan Clark-Nicolas",
     python_requires=">=3.7",
-    packages=find_packages(include=["cp2k_ml_workflows", "cp2k_ml_workflows.*"]),
+    packages=find_packages(
+        include=["cp2k_ml_workflows", "cp2k_ml_workflows.*", "cp2k_ml_workflows.*.*"]
+    ),
     entry_points={
         # make the scripts available as command line scripts
         "console_scripts": [
