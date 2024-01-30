@@ -160,3 +160,4 @@ cython_debug/
 #.idea/
 .flake8
 .vscode/settings.json
+.vscode/tasks.json
