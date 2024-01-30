@@ -1,0 +1,16 @@
+datasets:
+  training: toluene_ccsd_t-train.npz
+  test: toluene_ccsd_t-test.npz
+    #validation:
+
+md_engine: lammps
+
+models:
+  example:
+    engine: nequip
+    config: 
+  full: 
+    engine: nequip
+    config:
+  
+
