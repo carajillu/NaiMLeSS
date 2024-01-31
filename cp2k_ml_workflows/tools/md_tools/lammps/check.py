@@ -16,7 +16,6 @@ def parse_args():
 
 
 def main(path=None):
-    print("This is check_lammps.main()")
     if path is None:
         path = "/usr/bin/lmp"
     print("Checking LAMMPS usability...")

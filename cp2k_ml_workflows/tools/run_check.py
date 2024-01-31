@@ -32,32 +32,28 @@ def parse_args():
 
 
 def load_check_functions(tooltype):
-    print("this is run_check.load_check_functions()")
     check_functions = {}
-    package_name = "cp2k_ml_workflows.checks.check_" + tooltype + "_engines"
+    package_name = "cp2k_ml_workflows.tools." + tooltype + "_tools"
     package = importlib.import_module(package_name)
 
     # Iterate over all modules in the specified package
     for _, module_name, _ in pkgutil.iter_modules(
         package.__path__, prefix=package_name + "."
     ):
-        if module_name.startswith(package_name + ".check_"):
-            # Extract the actual module name after the prefix
-            simple_module_name = module_name[len(package_name) + 1 :]
+        # Extract the actual module name after the prefix
+        engine_name = module_name.split(".")[-1]
 
-            # Load the module
-            module = importlib.import_module(module_name)
+        # Load the module
+        module = importlib.import_module(module_name + ".check")
 
-            # Check if the module has a 'main' attribute
-            if hasattr(module, "main"):
-                engine_name = simple_module_name.replace("check_", "")
-                check_functions[engine_name] = module.main
+        # Check if the module has a 'main' attribute
+        if hasattr(module, "main"):
+            check_functions[engine_name] = module.main
 
     return check_functions
 
 
 def main(engine, path, tooltype, run_as_script=False):
-    print("This is run_check.main()")
     check_functions = load_check_functions(tooltype)
     try:
         engine_works = check_functions[engine](path)

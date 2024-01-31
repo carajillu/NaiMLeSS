@@ -2,7 +2,7 @@ import os
 import sys
 import argparse
 import yaml
-from cp2k_ml_workflows.checks.run_check import main as check_engine
+from cp2k_ml_workflows.tools.run_check import main as check_engine
 
 
 def parse_args():
