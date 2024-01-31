@@ -3,14 +3,16 @@ datasets:
   test: toluene_ccsd_t-test.npz
     #validation:
 
-md_engine: lammps
+md_engine: 
+  name: lammps
 
 models:
   example:
     engine: nequip
-    config: 
+    path: /home/joan/anaconda3/envs/cp2k-workflows/bin/nequip
+    config: example.yaml
   full: 
-    engine: nequip
-    config:
+    engine: requip
+    config: full.yaml
   
 

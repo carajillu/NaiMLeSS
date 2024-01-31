@@ -39,7 +39,18 @@ def check_config(yml):
             return False
 
     # Check presence of MD engine
-    if not (check_engine(md_engine, "md")):
+    try:
+        md_name = md_engine["name"]
+    except KeyError as error:
+        print(error)
+        print("A MD engine needs to be specified")
+        return False
+
+    if "path" not in md_engine.keys():
+        md_engine["path"] = None
+    md_path = md_engine["path"]
+
+    if not (check_engine(md_name, md_path, "md")):
         return False
 
     # Check presence of ML tools and ML config files
@@ -48,11 +59,15 @@ def check_config(yml):
         try:
             ml_tool = models[key]["engine"]
             config = models[key]["config"]
-        except Exception as error:
-            print(f"Model {key}: missing keyword {error}")
+        except KeyError as error:
+            print(f"Model {key}: {error}")
             return False
 
-        if not (check_engine(ml_tool, "ml")):
+        if "path" not in models[key].keys():
+            models[key]["path"] = None
+
+        ml_path = models[key]["path"]
+        if not (check_engine(ml_tool, ml_path, "ml")):
             return False
 
         if not os.path.isfile(config):

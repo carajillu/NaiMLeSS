@@ -13,17 +13,26 @@ def parse_args():
         default=None,
     )
     parser.add_argument(
+        "-p",
+        "--path",
+        nargs="?",
+        help="Path of the tool's executables (should follow a naming convention)",
+        default=None,
+    )
+    parser.add_argument(
         "-t",
         "--tooltype",
         nargs="?",
         help="Type of tool (should correspond to a submodule in checks)",
         default=None,
     )
+
     args = parser.parse_args()
     return args
 
 
 def load_check_functions(tooltype):
+    print("this is run_check.load_check_functions()")
     check_functions = {}
     package_name = "cp2k_ml_workflows.checks.check_" + tooltype + "_engines"
     package = importlib.import_module(package_name)
@@ -47,22 +56,22 @@ def load_check_functions(tooltype):
     return check_functions
 
 
-def main(engine, tooltype, run_as_script=False):
+def main(engine, path, tooltype, run_as_script=False):
+    print("This is run_check.main()")
     check_functions = load_check_functions(tooltype)
     try:
-        check_functions[engine]()
-        print(f"{tooltype} engine {engine} found")
-        return True
+        engine_works = check_functions[engine](path)
+        if engine_works:
+            print(f"{tooltype} engine {engine} found")
+            return True
+        else:
+            return False
     except KeyError:
         print(f"{tooltype} engine {engine} is not supported")
-        return False
-    except Exception as e:
-        print(f"{tooltype} engine {engine} is not installed or cannot be accessed.")
-        print(e)
         return False
 
 
 if __name__ == "__main__":
     args = parse_args()
     print(args)
-    main(engine=args.engine, tooltype=args.tooltype, run_as_script=True)
+    main(engine=args.engine, path=args.path, tooltype=args.tooltype, run_as_script=True)
