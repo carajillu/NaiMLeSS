@@ -1,7 +1,9 @@
 import os
+import shutil
 import sys
 import argparse
 import yaml
+import importlib
 from cp2k_ml_workflows.tools.run_check import main as check_engine
 
 
@@ -74,16 +76,50 @@ def check_config(yml):
             print(f"File {config} does not exist or is not accessible.")
             return False
 
+    print(
+        "All input files and necessary tools seem to be present and accessible. Proceeding."
+    )
     return True
 
 
+# For now, we train, evaluate and deploy in main()
+def run_training(model):
+    module_name = "cp2k_ml_workflows.tools.ml_tools." + model["engine"] + ".run"
+    module = importlib.import_module(module_name)
+    print(f"{module} imported successfully")
+    module.main(model["config"])
+    return
+
+
+def run_md(model):
+    return
+
+
 def main(running_as_script=False):
+    # Check config file for errors
     args = parse_args()
     with open(args.input, "r") as file:
         yml = yaml.safe_load(file)
         if not check_config(yml):
             print("Check output for errors in config file. Exiting.")
             sys.exit()
+    # Get execution root directory
+    root_dir = os.getcwd()
+    # Setup and run ML models
+    models = yml["models"]
+
+    for key in models:
+        os.makedirs(key, exist_ok=True)
+        shutil.copy(models[key]["config"], key + "/")
+        os.chdir(key)
+        run_training(models[key])
+        os.chdir(root_dir)
+
+    # Run MD calculations
+    for key in models:
+        os.chdir(key)
+        run_md(models[key])
+        os.chdir(root_dir)
 
     return
 
