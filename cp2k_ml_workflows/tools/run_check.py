@@ -31,7 +31,7 @@ def parse_args():
     return args
 
 
-def load_check_functions(tooltype):
+def load_check_functions(tooltype, check_type):
     check_functions = {}
     package_name = "cp2k_ml_workflows.tools." + tooltype + "_tools"
     package = importlib.import_module(package_name)
@@ -46,15 +46,15 @@ def load_check_functions(tooltype):
         # Load the module
         module = importlib.import_module(module_name + ".check")
 
-        # Check if the module has a 'main' attribute
-        if hasattr(module, "check_exe"):
-            check_functions[engine_name] = module.check_exe
+        # Check if the module has the relevant attribute
+        if hasattr(module, check_type):
+            check_functions[engine_name] = getattr(module, check_type)
 
     return check_functions
 
 
 def check_engine(engine, path, tooltype):
-    check_functions = load_check_functions(tooltype)
+    check_functions = load_check_functions(tooltype, "check_exe")
     try:
         engine_works = check_functions[engine](path)
         if engine_works:
@@ -67,8 +67,10 @@ def check_engine(engine, path, tooltype):
         return False
 
 
-def get_patches():
-    return True
+def get_patches(engine, path, tooltype):
+    check_functions = load_check_functions(tooltype, "get_patches")
+    patches = check_functions[engine](path)
+    return patches
 
 
 def main(engine, path, tooltype, run_as_script=False):

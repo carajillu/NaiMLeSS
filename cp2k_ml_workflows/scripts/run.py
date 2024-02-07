@@ -55,7 +55,9 @@ def check_config(yml):
 
     if not (check_engine(md_name, md_path, "md")):
         return False
-    # Check presence of ML tools and ML config files
+    patches = get_patches(md_name, md_path, "md")
+
+    # Check presence of ML tools, ML config files and compatibility with the selected MD engine
 
     for key in models.keys():
         try:
@@ -63,6 +65,12 @@ def check_config(yml):
             config = models[key]["config"]
         except KeyError as error:
             print(f"Model {key}: {error}")
+            return False
+
+        if ml_tool not in patches:
+            print(
+                f"{md_name} at {md_path} is not patched with {ml_tool}. Available patches are: {patches}"
+            )
             return False
 
         if "path" not in models[key].keys():

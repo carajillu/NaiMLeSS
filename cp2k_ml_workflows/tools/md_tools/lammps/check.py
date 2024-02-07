@@ -32,7 +32,7 @@ def check_exe(path=None):
         return False
 
 
-def check_patches(path):
+def get_patches(path):
     command = [path, "-h"]
     output = subprocess.run(command, capture_output=True, text=True).stdout
     pair_styles = []
@@ -45,6 +45,7 @@ def check_patches(path):
             break
         if capture_pair_styles:
             line = line.split()
+            pair_styles += line
     return pair_styles
 
 
