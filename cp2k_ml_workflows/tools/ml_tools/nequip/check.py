@@ -15,7 +15,7 @@ def parse_args():
     return args
 
 
-def main(path=None):
+def check_exe(path=None):
     print("Checking NequIP usability...")
     if path is None:
         path = "/usr/bin/nequip"
@@ -33,6 +33,10 @@ def main(path=None):
             return False
 
     return True
+
+
+def main(path):
+    return check_exe(path)
 
 
 if __name__ == "__main__":

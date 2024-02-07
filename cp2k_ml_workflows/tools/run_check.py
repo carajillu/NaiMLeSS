@@ -47,13 +47,13 @@ def load_check_functions(tooltype):
         module = importlib.import_module(module_name + ".check")
 
         # Check if the module has a 'main' attribute
-        if hasattr(module, "main"):
-            check_functions[engine_name] = module.main
+        if hasattr(module, "check_exe"):
+            check_functions[engine_name] = module.check_exe
 
     return check_functions
 
 
-def main(engine, path, tooltype, run_as_script=False):
+def check_engine(engine, path, tooltype):
     check_functions = load_check_functions(tooltype)
     try:
         engine_works = check_functions[engine](path)
@@ -65,6 +65,15 @@ def main(engine, path, tooltype, run_as_script=False):
     except KeyError:
         print(f"{tooltype} engine {engine} is not supported")
         return False
+
+
+def get_patches():
+    return True
+
+
+def main(engine, path, tooltype, run_as_script=False):
+    engine_present = check_engine(engine, path, tooltype)
+    return engine_present
 
 
 if __name__ == "__main__":

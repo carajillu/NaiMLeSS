@@ -4,7 +4,8 @@ import sys
 import argparse
 import yaml
 import importlib
-from cp2k_ml_workflows.tools.run_check import main as check_engine
+from cp2k_ml_workflows.tools.run_check import check_engine as check_engine
+from cp2k_ml_workflows.tools.run_check import get_patches as get_patches
 
 
 def parse_args():
@@ -54,7 +55,6 @@ def check_config(yml):
 
     if not (check_engine(md_name, md_path, "md")):
         return False
-
     # Check presence of ML tools and ML config files
 
     for key in models.keys():

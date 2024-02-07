@@ -1,4 +1,5 @@
 import argparse
+import subprocess
 import os
 
 
@@ -15,7 +16,7 @@ def parse_args():
     return args
 
 
-def main(path=None):
+def check_exe(path=None):
     if path is None:
         path = "/usr/bin/lmp"
     print("Checking LAMMPS usability...")
@@ -29,6 +30,26 @@ def main(path=None):
         else:
             print(f"LAMMPS seems to be located at {args.path}, but cannot be executed")
         return False
+
+
+def check_patches(path):
+    command = [path, "-h"]
+    output = subprocess.run(command, capture_output=True, text=True).stdout
+    pair_styles = []
+    capture_pair_styles = False
+    for line in output.split("\n"):
+        if line == "* Pair styles:":
+            capture_pair_styles = True
+            continue
+        if line == "* Bond styles:":
+            break
+        if capture_pair_styles:
+            line = line.split()
+    return pair_styles
+
+
+def main(path):
+    return check_exe(path)
 
 
 if __name__ == "__main__":
