@@ -4,8 +4,8 @@ import sys
 import argparse
 import yaml
 import importlib
-from cp2k_ml_workflows.tools.run_check import check_engine as check_engine
-from cp2k_ml_workflows.tools.run_check import get_patches as get_patches
+from cp2k_ml_workflows.tools.check import check_engine as check_engine
+from cp2k_ml_workflows.tools.check import get_patches as get_patches
 
 
 def parse_args():
@@ -100,6 +100,7 @@ def run_training(model):
 
 
 def run_md(model):
+
     return
 
 
