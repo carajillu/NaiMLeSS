@@ -1,7 +1,9 @@
 import subprocess
 
 
-def patch_md_config(md_config_in, model_name, ml_tool, deployed_name):
+def patch_md_config(
+    md_config_in: str, model_name: str, ml_tool: str, deployed_name: str
+) -> str:
     cfg_mlmd = md_config_in + "." + model_name
     fileout = open(cfg_mlmd, "w")
     with open(md_config_in, "r") as filein:
@@ -20,7 +22,7 @@ def patch_md_config(md_config_in, model_name, ml_tool, deployed_name):
     return cfg_mlmd
 
 
-def run_md(config, path):
+def run_md(config: str, path: str) -> bool:
     log_name = config + ".lammps.log"
     cmd = [path, "-in", config, "-log", log_name]
     stdout = open(config + ".stdout", "w")
@@ -34,7 +36,9 @@ def run_md(config, path):
     return True
 
 
-def main(md_path, md_config_in, model_name, ml_tool, deployed_name):
+def main(
+    md_path: str, md_config_in: str, model_name: str, ml_tool: str, deployed_name: str
+) -> bool:
     cfg_mlmd = patch_md_config(md_config_in, model_name, ml_tool, deployed_name)
     return run_md(cfg_mlmd, md_path)
 

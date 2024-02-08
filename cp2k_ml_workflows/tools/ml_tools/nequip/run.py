@@ -7,7 +7,7 @@ from nequip.scripts.train import default_config
 from nequip.scripts.deploy import main as nequip_deploy
 
 
-def parse_args():
+def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-i",
@@ -24,7 +24,7 @@ def parse_args():
 # execute nequip-train. config is the nequip config filename
 # supplied in the cp2k-ml-workflows config file yml["models"][model_name]["config"]
 # Not too elegant but it does not mess with the nequip functions at all.
-def run_nequip_train(config: str):
+def run_nequip_train(config: str) -> None:
     args = ["", config]
     original_argv = sys.argv[
         :
@@ -46,7 +46,7 @@ def run_nequip_benchmark():
     return
 
 
-def run_nequip_deploy(config_dict):
+def run_nequip_deploy(config_dict: dict) -> str:
     deploy_dir = config_dict["root"] + "/" + config_dict["run_name"]
     deploy_name = config_dict["run_name"] + "-deployed.pth"
     original_argv = sys.argv[:]
@@ -59,7 +59,7 @@ def run_nequip_deploy(config_dict):
     return deploy_name
 
 
-def main(config_path: str, print_to_screen: bool = False):
+def main(config_path: str, print_to_screen: bool = False) -> str:
     config_dict = Config.from_file(
         config_path, defaults=default_config
     )  # to reuse later

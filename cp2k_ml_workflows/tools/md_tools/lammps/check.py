@@ -3,7 +3,7 @@ import subprocess
 import os
 
 
-def parse_args():
+def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-x",
@@ -16,7 +16,7 @@ def parse_args():
     return args
 
 
-def check_exe(path=None):
+def check_exe(path: str = None) -> bool:
     if path is None:
         path = "/usr/bin/lmp"
     print("Checking LAMMPS usability...")
@@ -32,7 +32,7 @@ def check_exe(path=None):
         return False
 
 
-def get_patches(path):
+def get_patches(path: str) -> list[str]:
     command = [path, "-h"]
     output = subprocess.run(command, capture_output=True, text=True).stdout
     pair_styles = []
@@ -49,7 +49,7 @@ def get_patches(path):
     return pair_styles
 
 
-def main(path):
+def main(path: str) -> bool:
     return check_exe(path)
 
 

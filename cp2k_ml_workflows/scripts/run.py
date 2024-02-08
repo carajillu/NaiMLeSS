@@ -22,7 +22,7 @@ def parse_args():
     return args
 
 
-def check_config(yml):
+def check_config(yml: dict = None):
     # Check outer keys
     try:
         datasets = yml["datasets"]
@@ -91,7 +91,7 @@ def check_config(yml):
     return True
 
 
-def main(running_as_script=False):
+def main():
     # Check config file for errors
     args = parse_args()
     with open(args.input, "r") as file:
@@ -130,4 +130,4 @@ def main(running_as_script=False):
 
 
 if __name__ == "__main__":
-    main(running_as_script=True)
+    main()

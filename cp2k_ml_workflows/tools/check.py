@@ -3,12 +3,13 @@ import importlib
 import pkgutil
 
 
-def parse_args():
+def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-m",
         "--engine",
         nargs="?",
+        type=str,
         help="Tool you want to check for",
         default=None,
     )
@@ -16,6 +17,7 @@ def parse_args():
         "-p",
         "--path",
         nargs="?",
+        type=str,
         help="Path of the tool's executables (should follow a naming convention)",
         default=None,
     )
@@ -23,6 +25,7 @@ def parse_args():
         "-t",
         "--tooltype",
         nargs="?",
+        type=str,
         help="Type of tool (should correspond to a submodule in checks)",
         default=None,
     )
@@ -31,7 +34,7 @@ def parse_args():
     return args
 
 
-def load_check_functions(tooltype, check_type):
+def load_check_functions(tooltype: str, check_type: str) -> dict:
     check_functions = {}
     package_name = "cp2k_ml_workflows.tools." + tooltype + "_tools"
     package = importlib.import_module(package_name)
@@ -53,7 +56,7 @@ def load_check_functions(tooltype, check_type):
     return check_functions
 
 
-def check_engine(engine, path, tooltype):
+def check_engine(engine: str, path: str, tooltype: str) -> bool:
     check_functions = load_check_functions(tooltype, "check_exe")
     try:
         engine_works = check_functions[engine](path)
@@ -67,18 +70,17 @@ def check_engine(engine, path, tooltype):
         return False
 
 
-def get_patches(engine, path, tooltype):
+def get_patches(engine: str, path: str, tooltype: str) -> list[str]:
     check_functions = load_check_functions(tooltype, "get_patches")
     patches = check_functions[engine](path)
     return patches
 
 
-def main(engine, path, tooltype, run_as_script=False):
+def main(engine: str, path: str, tooltype: str) -> bool:
     engine_present = check_engine(engine, path, tooltype)
     return engine_present
 
 
 if __name__ == "__main__":
     args = parse_args()
-    print(args)
-    main(engine=args.engine, path=args.path, tooltype=args.tooltype, run_as_script=True)
+    main(engine=args.engine, path=args.path, tooltype=args.tooltype)

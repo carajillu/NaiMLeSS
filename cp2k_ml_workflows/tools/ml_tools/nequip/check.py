@@ -2,7 +2,7 @@ import argparse
 import os
 
 
-def parse_args():
+def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-x",
@@ -15,7 +15,7 @@ def parse_args():
     return args
 
 
-def check_exe(path=None):
+def check_exe(path: str = None) -> bool:
     print("Checking NequIP usability...")
     if path is None:
         path = "/usr/bin/nequip"
@@ -35,7 +35,7 @@ def check_exe(path=None):
     return True
 
 
-def main(path):
+def main(path: str) -> bool:
     return check_exe(path)
 
 
