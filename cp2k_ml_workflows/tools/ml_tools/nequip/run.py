@@ -55,7 +55,7 @@ def run_nequip_deploy(config_dict):
         nequip_deploy()  # This simulates running the command
     finally:
         sys.argv = original_argv  # Restore the original sys.argv
-    return
+    return deploy_name
 
 
 def main(config_path, path=None):
@@ -65,9 +65,7 @@ def main(config_path, path=None):
     run_nequip_train(config_path)
     run_nequip_evaluate()
     run_nequip_benchmark()
-    run_nequip_deploy(config_dict)
-
-    return
+    return run_nequip_deploy(config_dict)
 
 
 if __name__ == "__main__":

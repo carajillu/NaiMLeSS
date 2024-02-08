@@ -3,9 +3,10 @@ import shutil
 import sys
 import argparse
 import yaml
-import importlib
 from cp2k_ml_workflows.tools.check import check_engine as check_engine
 from cp2k_ml_workflows.tools.check import get_patches as get_patches
+from cp2k_ml_workflows.tools.run import run_training as run_training
+from cp2k_ml_workflows.tools.run import run_md as run_md
 
 
 def parse_args():
@@ -90,20 +91,6 @@ def check_config(yml):
     return True
 
 
-# For now, we train, evaluate and deploy in main()
-def run_training(model):
-    module_name = "cp2k_ml_workflows.tools.ml_tools." + model["engine"] + ".run"
-    module = importlib.import_module(module_name)
-    print(f"{module} imported successfully")
-    module.main(model["config"])
-    return
-
-
-def run_md(model):
-
-    return
-
-
 def main(running_as_script=False):
     # Check config file for errors
     args = parse_args()
@@ -114,21 +101,27 @@ def main(running_as_script=False):
             sys.exit()
     # Get execution root directory
     root_dir = os.getcwd()
-    # Setup and run ML models
-    models = yml["models"]
 
-    for key in models:
+    models = yml["models"]
+    md_engine = yml["md_engine"]
+    for key in models.keys():
         os.makedirs(key, exist_ok=True)
         shutil.copy(models[key]["config"], key + "/")
+        shutil.copy(md_engine["config"], key + "/")
+        shutil.copy(md_engine["xyz"], key + "/")
         os.chdir(key)
-        run_training(models[key])
+        deployed_name = run_training(models[key]["engine"], models[key]["config"])
+        run_md(
+            md_engine["name"],
+            md_engine["path"],
+            md_engine["config"],
+            key,
+            models[key]["engine"],
+            deployed_name,
+        )
         os.chdir(root_dir)
 
     # Run MD calculations
-    for key in models:
-        os.chdir(key)
-        run_md(models[key])
-        os.chdir(root_dir)
 
     return
 

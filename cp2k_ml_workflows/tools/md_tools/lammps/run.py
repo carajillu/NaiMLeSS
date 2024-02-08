@@ -10,8 +10,10 @@ def patch_md_config(md_config_in, model_name, ml_tool, deployed_name):
                 lineout = "pair_style " + ml_tool + "\n"
             elif line.startswith("pair_coeff"):
                 line = line.split()
-                elements = line[3:]
-                lineout = "* * " + deployed_name + " " + " ".join(elements) + "\n"
+                elements = line[4:]
+                lineout = (
+                    "pair_coeff * * " + deployed_name + " " + " ".join(elements) + "\n"
+                )
             else:
                 lineout = line
             fileout.write(lineout)
@@ -21,8 +23,8 @@ def patch_md_config(md_config_in, model_name, ml_tool, deployed_name):
 def run_md(config, path):
     log_name = config + ".lammps.log"
     cmd = [path, "-in", config, "-log", log_name]
-    stdout = config + ".stdout"
-    stderr = config + ".stderr"
+    stdout = open(config + ".stdout", "w")
+    stderr = open(config + ".stderr", "w")
     try:
         subprocess.run(cmd, stdout=stdout, stderr=stderr, text=True)
     except Exception as error:
