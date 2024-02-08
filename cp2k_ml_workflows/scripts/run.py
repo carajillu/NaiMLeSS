@@ -9,7 +9,7 @@ from cp2k_ml_workflows.tools.run import run_training as run_training
 from cp2k_ml_workflows.tools.run import run_md as run_md
 
 
-def parse_args():
+def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-i",
@@ -22,11 +22,11 @@ def parse_args():
     return args
 
 
-def check_config(yml: dict = None):
+def check_config(yml: dict) -> bool:
     # Check outer keys
     try:
         datasets = yml["datasets"]
-        md_engine = yml["md_engine"]
+        md = yml["md"]
         models = yml["models"]
         print("All keys located")
     except Exception as error:
@@ -44,45 +44,45 @@ def check_config(yml: dict = None):
 
     # Check presence of MD engine
     try:
-        md_name = md_engine["name"]
+        md_engine_name = md["engine_name"]
     except KeyError as error:
         print(error)
         print("A MD engine needs to be specified")
         return False
 
-    if "path" not in md_engine.keys():
-        md_engine["path"] = None
-    md_path = md_engine["path"]
+    if "engine_path" not in md.keys():
+        md["engine_path"] = None
+    md_engine_path = md["engine_path"]
 
-    if not (check_engine(md_name, md_path, "md")):
+    if not (check_engine(md_engine_name, md_engine_path, "md")):
         return False
-    patches = get_patches(md_name, md_path, "md")
+    patches = get_patches(md_engine_name, md_engine_path, "md")
 
     # Check presence of ML tools, ML config files and compatibility with the selected MD engine
 
     for key in models.keys():
         try:
-            ml_tool = models[key]["engine"]
-            config = models[key]["config"]
+            ml_engine_name = models[key]["engine_name"]
+            ml_config = models[key]["ml_config"]
         except KeyError as error:
             print(f"Model {key}: {error}")
             return False
 
-        if ml_tool not in patches:
+        if ml_engine_name not in patches:
             print(
-                f"{md_name} at {md_path} is not patched with {ml_tool}. Available patches are: {patches}"
+                f"{md_engine_name} at {md_engine_path} is not patched with {ml_engine_name}. Available patches are: {patches}"
             )
             return False
 
-        if "path" not in models[key].keys():
-            models[key]["path"] = None
+        if "engine_path" not in models[key].keys():
+            models[key]["engine_path"] = None
 
-        ml_path = models[key]["path"]
-        if not (check_engine(ml_tool, ml_path, "ml")):
+        ml_engine_path = models[key]["engine_path"]
+        if not (check_engine(ml_engine_name, ml_engine_path, "ml")):
             return False
 
-        if not os.path.isfile(config):
-            print(f"File {config} does not exist or is not accessible.")
+        if not os.path.isfile(ml_config):
+            print(f"File {ml_config} does not exist or is not accessible.")
             return False
 
     print(
@@ -91,7 +91,7 @@ def check_config(yml: dict = None):
     return True
 
 
-def main():
+def main() -> None:
     # Check config file for errors
     args = parse_args()
     with open(args.input, "r") as file:
@@ -103,24 +103,26 @@ def main():
     root_dir = os.getcwd()
 
     models = yml["models"]
-    md_engine = yml["md_engine"]
+    md = yml["md"]
     for key in models.keys():
         os.makedirs(key, exist_ok=True)
-        shutil.copy(models[key]["config"], key + "/")
-        shutil.copy(md_engine["config"], key + "/")
-        shutil.copy(md_engine["xyz"], key + "/")
+        shutil.copy(models[key]["ml_config"], key + "/")
+        shutil.copy(md["md_config"], key + "/")
+        shutil.copy(md["xyz"], key + "/")
         os.chdir(key)
         print(f"Training model: {key}...")
-        deployed_name = run_training(models[key]["engine"], models[key]["config"])
+        deployed_name = run_training(
+            models[key]["engine_name"], models[key]["ml_config"]
+        )
         print("... Model deployed")
 
-        print(f"Running {md_engine['name']} calculation with model {key}")
+        print(f"Running {md['engine_name']} calculation with model {key}")
         run_md(
-            md_engine["name"],
-            md_engine["path"],
-            md_engine["config"],
+            md["engine_name"],
+            md["engine_path"],
+            md["md_config"],
             key,
-            models[key]["engine"],
+            models[key]["engine_name"],
             deployed_name,
         )
         print("... Calculation finished")
