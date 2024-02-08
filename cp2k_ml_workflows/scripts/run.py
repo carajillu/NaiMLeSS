@@ -110,7 +110,11 @@ def main(running_as_script=False):
         shutil.copy(md_engine["config"], key + "/")
         shutil.copy(md_engine["xyz"], key + "/")
         os.chdir(key)
+        print(f"Training model: {key}...")
         deployed_name = run_training(models[key]["engine"], models[key]["config"])
+        print("... Model deployed")
+
+        print(f"Running {md_engine['name']} calculation with model {key}")
         run_md(
             md_engine["name"],
             md_engine["path"],
@@ -119,9 +123,8 @@ def main(running_as_script=False):
             models[key]["engine"],
             deployed_name,
         )
+        print("... Calculation finished")
         os.chdir(root_dir)
-
-    # Run MD calculations
 
     return
 

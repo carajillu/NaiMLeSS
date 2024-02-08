@@ -1,5 +1,6 @@
 import argparse
 import sys
+from cp2k_ml_workflows.aidetools.log_redirector import setup_logging_to_file
 from nequip.utils import Config
 from nequip.scripts.train import main as nequip_train
 from nequip.scripts.train import default_config
@@ -30,7 +31,7 @@ def run_nequip_train(config: str):
     ]  # Backup the original sys.argv in case it's needed elsewhere
     sys.argv = args  # Temporarily replace sys.argv with your arguments list
     try:
-        nequip_train()  # This simulates running the command
+        nequip_train(running_as_script=False)  # This simulates running the command
     finally:
         sys.argv = original_argv  # Restore the original sys.argv
     return
@@ -58,10 +59,11 @@ def run_nequip_deploy(config_dict):
     return deploy_name
 
 
-def main(config_path, path=None):
+def main(config_path: str, path: str = None, print_to_screen: bool = False):
     config_dict = Config.from_file(
         config_path, defaults=default_config
     )  # to reuse later
+    setup_logging_to_file("nequip.log")
     run_nequip_train(config_path)
     run_nequip_evaluate()
     run_nequip_benchmark()
