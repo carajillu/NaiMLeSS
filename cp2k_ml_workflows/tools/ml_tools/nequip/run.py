@@ -10,11 +10,11 @@ from nequip.scripts.deploy import main as nequip_deploy
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "-x",
-        "--path",
+        "-i",
+        "--config",
         nargs="?",
-        help="Path for the nequip executables",
-        default="/usr/bin/nequip",
+        help="Path of the nequip config",
+        default="config.yaml",
     )
     args = parser.parse_args()
     return args
@@ -59,11 +59,12 @@ def run_nequip_deploy(config_dict):
     return deploy_name
 
 
-def main(config_path: str, path: str = None, print_to_screen: bool = False):
+def main(config_path: str, print_to_screen: bool = False):
     config_dict = Config.from_file(
         config_path, defaults=default_config
     )  # to reuse later
-    setup_logging_to_file("nequip.log")
+    if not print_to_screen:
+        setup_logging_to_file("nequip.log")
     run_nequip_train(config_path)
     run_nequip_evaluate()
     run_nequip_benchmark()
@@ -72,5 +73,4 @@ def main(config_path: str, path: str = None, print_to_screen: bool = False):
 
 if __name__ == "__main__":
     args = parse_args()
-    main(args.config, args.path)
-    main()
+    main(args.config, print_to_screen=True)
