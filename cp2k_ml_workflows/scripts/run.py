@@ -104,11 +104,14 @@ def main() -> None:
 
     models = yml["models"]
     md = yml["md"]
+    datasets = yml["datasets"]
     for key in models.keys():
         os.makedirs(key, exist_ok=True)
         shutil.copy(models[key]["ml_config"], key + "/")
         shutil.copy(md["md_config"], key + "/")
         shutil.copy(md["xyz"], key + "/")
+        for dskey in datasets.keys():
+            shutil.copy(datasets[dskey], key + "/")
         os.chdir(key)
         print(f"Training model: {key}...")
         deployed_name = run_training(
