@@ -73,4 +73,5 @@ def main(config_path: str, print_to_screen: bool = False) -> str:
 
 if __name__ == "__main__":
     args = parse_args()
-    main(args.config, print_to_screen=True)
+    deploy_name = main(args.config, print_to_screen=True)
+    print(f"Model deployed as {deploy_name}")

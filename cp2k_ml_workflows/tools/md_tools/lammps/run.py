@@ -1,4 +1,46 @@
 import subprocess
+import argparse
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--md_path",
+        nargs="?",
+        type=str,
+        help="Path of the MD engine",
+        default=None,
+    )
+    parser.add_argument(
+        "--md_cfg",
+        nargs="?",
+        type=str,
+        help="classical MD config file (no ML)",
+        default=None,
+    )
+    parser.add_argument(
+        "--ml_name",
+        nargs="?",
+        type=str,
+        help="Name of the ML engine",
+        default=None,
+    )
+    parser.add_argument(
+        "--deployed",
+        nargs="?",
+        type=str,
+        help="Deployed ML potential file",
+        default=None,
+    )
+    parser.add_argument(
+        "--model",
+        nargs="?",
+        type=str,
+        help="Model name for creating subfolders",
+        default=None,
+    )
+    args = parser.parse_args()
+    return args
 
 
 def patch_md_config(
@@ -44,4 +86,5 @@ def main(
 
 
 if __name__ == "__main__":
-    main()
+    args = parse_args()
+    main(args.md_path, args.md_cfg, args.model, args.ml_name, args.deployed)
