@@ -3,25 +3,23 @@ from pathlib import Path
 
 # see https://packaging.python.org/guides/single-sourcing-package-version/
 version_dict = {}
-with open(Path(__file__).parents[0] / "cp2k_ml_workflows/_version.py") as fp:
+with open(Path(__file__).parents[0] / "naimless/_version.py") as fp:
     exec(fp.read(), version_dict)
 version = version_dict["__version__"]
 del version_dict
 
 setup(
-    name="cp2k-ml-workflows",
+    name="naimless",
     version=version,
-    description="CP2K ML Workflows is a tool that automates the training of ML potentials using data from CP2K in order to run ML-MD simulations.",
-    download_url="https://github.com/carajillu/cp2k_ml_workflows/",
+    description="Interface for QM, ML and MD packages to automatically generate electronic structure data, train ML potentials and run ML-MD simulations",
+    download_url="https://github.com/carajillu/naimless/",
     author="Joan Clark-Nicolas",
     python_requires=">=3.7",
-    packages=find_packages(
-        include=["cp2k_ml_workflows", "cp2k_ml_workflows.*", "cp2k_ml_workflows.*.*"]
-    ),
+    packages=find_packages(include=["naimless"]),
     entry_points={
         # make the scripts available as command line scripts
         "console_scripts": [
-            "cp2k-ml-workflows = cp2k_ml_workflows.scripts.run:main",
+            "naimless = naimless.scripts.run:main",
         ]
     },
     install_requires=[

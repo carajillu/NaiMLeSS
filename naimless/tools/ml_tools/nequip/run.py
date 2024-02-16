@@ -1,6 +1,6 @@
 import argparse
 import sys
-from cp2k_ml_workflows.aidetools.log_redirector import setup_logging_to_file
+from naimless.aidetools.log_redirector import setup_logging_to_file
 from nequip.utils import Config
 from nequip.scripts.train import main as nequip_train
 from nequip.scripts.train import default_config

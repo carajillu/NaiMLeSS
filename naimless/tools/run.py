@@ -59,7 +59,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def run_training(ml_name: str, ml_config: str) -> str:
-    module_name = "cp2k_ml_workflows.tools.ml_tools." + ml_name + ".run"
+    module_name = "naimless.tools.ml_tools." + ml_name + ".run"
     module = importlib.import_module(module_name)
     print(f"{module} imported successfully")
     deployed_name = module.main(ml_config)
@@ -74,7 +74,7 @@ def run_md(
     ml_tool: str,
     deployed_name: str,
 ) -> bool:
-    module_name = "cp2k_ml_workflows.tools.md_tools." + md_name + ".run"
+    module_name = "naimless.tools.md_tools." + md_name + ".run"
     module = importlib.import_module(module_name)
     cfg_mlmd = module.patch_md_config(md_config_in, model_name, ml_tool, deployed_name)
     module.run_md(cfg_mlmd, md_path)

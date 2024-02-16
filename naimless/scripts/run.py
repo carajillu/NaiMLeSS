@@ -3,10 +3,10 @@ import shutil
 import sys
 import argparse
 import yaml
-from cp2k_ml_workflows.tools.check import check_engine as check_engine
-from cp2k_ml_workflows.tools.check import get_patches as get_patches
-from cp2k_ml_workflows.tools.run import run_training as run_training
-from cp2k_ml_workflows.tools.run import run_md as run_md
+from naimless.tools.check import check_engine as check_engine
+from naimless.tools.check import get_patches as get_patches
+from naimless.tools.run import run_training as run_training
+from naimless.tools.run import run_md as run_md
 
 
 def parse_args() -> argparse.Namespace:

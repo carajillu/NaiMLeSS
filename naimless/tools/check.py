@@ -36,7 +36,7 @@ def parse_args() -> argparse.Namespace:
 
 def load_check_functions(tooltype: str, check_type: str) -> dict:
     check_functions = {}
-    package_name = "cp2k_ml_workflows.tools." + tooltype + "_tools"
+    package_name = "naimless.tools." + tooltype + "_tools"
     package = importlib.import_module(package_name)
 
     # Iterate over all modules in the specified package
