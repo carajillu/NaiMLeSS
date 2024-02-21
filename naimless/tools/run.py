@@ -58,6 +58,14 @@ def parse_args() -> argparse.Namespace:
     return args
 
 
+def run_qm(qm_name: str, qm_path: str, qm_config: str):
+    module_name = "naimless.tools.qm_tools." + qm_name + ".run"
+    module = importlib.import_module(module_name)
+    print(f"{module} imported successfully")
+    module.main(qm_path, qm_config)
+    return
+
+
 def run_training(ml_name: str, ml_config: str) -> str:
     module_name = "naimless.tools.ml_tools." + ml_name + ".run"
     module = importlib.import_module(module_name)
