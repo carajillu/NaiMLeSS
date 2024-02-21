@@ -11,14 +11,21 @@ class NaiMLeSS:
     def __init__(
         self,
         name: str,
-        n_atoms: np.array,
-        atom_names: np.array,
+        n_atoms: int,
+        atom_names: list,  # dimension = 1 x n_atoms
+        n_structures: int,
+        structure_ids: list,  # len = n_structures
+        comments: list,
+        R: np.array,  # dimension = n_structures x n_atoms x 3
         properties: dict,
-        R: np.array = None,
     ) -> None:
+        self.n_structures = n_structures
+        self.structure_ids = structure_ids  # dimension = 1 x n_structures
+        self.comments = comments  # dimension 1 x n_structures
         self.name = name
         self.n_atoms = n_atoms
         self.atom_names = atom_names
+        self.R = R
         self.load_properties(properties)
         return
 
@@ -31,12 +38,9 @@ class NaiMLeSS:
 
         # Load all the requested properties
         for submodule_name, prop_names in properties.items():
-            print(submodule_name)
             # Dynamically create a type for the submodule
             SubmoduleClass = type(submodule_name, (), {})
-            print(SubmoduleClass)
             submodule_instance = SubmoduleClass()
-            print(submodule_instance)
 
             try:
                 module = importlib.import_module(submodule_name)
