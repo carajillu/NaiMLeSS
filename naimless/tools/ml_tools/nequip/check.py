@@ -15,7 +15,7 @@ def parse_args() -> argparse.Namespace:
     return args
 
 
-def check_exe(path: str = None) -> bool:
+def check_exe(path: str = None) -> str:
     print("Checking NequIP usability...")
     if path is None:
         path = "/usr/bin/nequip"
@@ -30,12 +30,12 @@ def check_exe(path: str = None) -> bool:
                 print(f"{path_x} does not exist or it is not accessible")
             else:
                 print(f"{path_x} exists but cannot be executed")
-            return False
+            return None
 
-    return True
+    return path
 
 
-def main(path: str) -> bool:
+def main(path: str) -> str:
     return check_exe(path)
 
 

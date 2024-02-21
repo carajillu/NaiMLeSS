@@ -16,20 +16,20 @@ def parse_args() -> argparse.Namespace:
     return args
 
 
-def check_exe(path: str = None) -> bool:
+def check_exe(path: str = None) -> str:
     if path is None:
         path = "/usr/bin/lmp"
     print("Checking LAMMPS usability...")
     if os.access(path, os.X_OK):
         print(f"The file at {path} is executable.")
-        return True
+        return path
     else:
         print("Checking LAMMPS presence...")
         if not os.path.exists(path):
             print(f"{path} does not exist or it is not accessible")
         else:
             print(f"LAMMPS seems to be located at {args.path}, but cannot be executed")
-        return False
+        return None
 
 
 def get_patches(path: str) -> list[str]:
@@ -49,7 +49,7 @@ def get_patches(path: str) -> list[str]:
     return pair_styles
 
 
-def main(path: str) -> bool:
+def main(path: str) -> str:
     return check_exe(path)
 
 

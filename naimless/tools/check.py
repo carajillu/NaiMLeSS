@@ -59,15 +59,15 @@ def load_check_functions(tooltype: str, check_type: str) -> dict:
 def check_engine(engine: str, path: str, tooltype: str) -> bool:
     check_functions = load_check_functions(tooltype, "check_exe")
     try:
-        engine_works = check_functions[engine](path)
-        if engine_works:
+        path = check_functions[engine](path)
+        if path:
             print(f"{tooltype} engine {engine} found")
-            return True
+            return path
         else:
-            return False
+            return None
     except KeyError:
         print(f"{tooltype} engine {engine} is not supported")
-        return False
+        return None
 
 
 def get_patches(engine: str, path: str, tooltype: str) -> list[str]:
@@ -77,8 +77,8 @@ def get_patches(engine: str, path: str, tooltype: str) -> list[str]:
 
 
 def main(engine: str, path: str, tooltype: str) -> bool:
-    engine_present = check_engine(engine, path, tooltype)
-    return engine_present
+    engine_path = check_engine(engine, path, tooltype)
+    return engine_path
 
 
 if __name__ == "__main__":
