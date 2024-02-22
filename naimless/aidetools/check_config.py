@@ -36,7 +36,6 @@ def check_config(yml: dict) -> dict:
         system["name"]
         filein = open(system["structure"], "r")
         filein.close()
-        system["properties"]
     except KeyError as error:
         print(f"key not found in field system: {error}")
         return None
@@ -60,6 +59,7 @@ def check_config(yml: dict) -> dict:
         return None
     else:
         qm["engine_path"] = qm_engine_path
+
     # Check presence of MD engine
     try:
         md_engine_name = md["engine_name"]
