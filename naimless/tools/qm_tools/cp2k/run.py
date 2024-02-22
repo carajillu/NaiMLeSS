@@ -1,5 +1,6 @@
 import subprocess
 import argparse
+import os
 
 
 def parse_args() -> argparse.Namespace:
@@ -22,8 +23,10 @@ def parse_args() -> argparse.Namespace:
     return args
 
 
-def run_qm(config: str, path: str) -> bool:
+def run_qm(config: str, path: str) -> str:
     log_name = config + ".cp2k.log"
+    if os.path.isfile(log_name):
+        return log_name
     cmd = [path, "-i", config, "-o", log_name]
     stdout = open(config + ".stdout", "w")
     stderr = open(config + ".stderr", "w")
@@ -31,9 +34,8 @@ def run_qm(config: str, path: str) -> bool:
         subprocess.run(cmd, stdout=stdout, stderr=stderr, text=True)
     except Exception as error:
         print(error)
-        return False
-
-    return True
+        return None
+    return log_name
 
 
 def main(
