@@ -1,18 +1,38 @@
-datasets:
-  training: toluene_ccsd_t-train.npz
-  test: toluene_ccsd_t-test.npz
+
+#datasets:
+#  training: toluene_ccsd_t-train.npz
+#  test: toluene_ccsd_t-test.npz
     #validation:
 
-md_engine: 
-  name: lammps
+system:
+  name: toluene
+  npz: #This would allow for restart without data loss
+  structure: toluene3000.xyz #you get the atom names and numbers from here
+  n_iter: 1
 
+qm:
+   engine_name: cp2k
+   qm_config: aimd.in
+   training_data: #The data we will extract to train models 
+      singlepoint:
+          E: toluene-1.ener # Potential Energy from a single point calculation
+          F: toluene-frc-1.xyz # Forces from a single point calculation
+
+md: 
+  engine_name: lammps
+  engine_path: /home/joan/github/lammps/build/lmp
+  xyz: structure.data
+  md_config: minimize.in
+     
 models:
   example:
-    engine: nequip
-    path: /home/joan/anaconda3/envs/cp2k-workflows/bin/nequip
-    config: example.yaml
-  full: 
-    engine: requip
-    config: full.yaml
+    engine_name: nequip
+    engine_path: /home/joan/anaconda3/envs/cp2k-workflows/bin/nequip
+    ml_config: minimal.yaml
+    training_name: nequip.npz
+    data_format: npz
+    training_data:
+      singlepoint: [E,F]
+
   
 
