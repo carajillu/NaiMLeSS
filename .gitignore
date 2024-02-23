@@ -161,5 +161,7 @@ cython_debug/
 .flake8
 .vscode/
 configs/
-!/configs/config.yml
+!configs/config.yml
+!configs/*/input/
+!configs/*/README.md
 
