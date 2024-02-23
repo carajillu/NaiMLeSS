@@ -31,7 +31,7 @@ def E(log_file: str) -> np.array:
                     continue
                 else:
                     line = line.split()
-                    Pot = float(line[i])
+                    Pot = [float(line[i])]
         return np.array([Pot])
 
 
