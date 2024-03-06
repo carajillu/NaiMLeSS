@@ -22,6 +22,6 @@ setup(
             "naimless = naimless.scripts.run:main",
         ]
     },
-    install_requires=["numpy", "pandas"],
+    install_requires=["numpy", "pandas", "simple_slurm", "nequip"],
     zip_safe=True,
 )
