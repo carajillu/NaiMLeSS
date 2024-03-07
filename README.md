@@ -9,7 +9,8 @@ Workflows to train ML models using data from CP2K and run ML-MD
 - [X] Add new class for the naimless object -- Completed on 23/02/2024
 - [X] tools/ml_tools/nequip: add data format exchanger submodule (to exchange data format between nequip and naimless) -- Completed on 23/02/2024
 - [X] Add support for CP2K -- Comlpeted on 23/02/2024
-- [ ] tools/md_tools/lammps: add data format exchanger submodule (to exchange data format between lammps and naimless)
+- [X] tools/md_tools/lammps: add data format exchanger submodule (to exchange data format between lammps and naimless) -- Completed on 04/03/2024
+- [ ] Add slurm capability
 - [ ] Add sample tool submodule
 - [ ] Write development doc
 - [ ] Create trajectory analysis skeleton
