@@ -20,7 +20,7 @@ Most recent change on the bottom.
 - item
 - item
 
-## [0.1.0] - YYYY-MM-DD
+## [0.1.0] - 2024-03-13
 ### Added
 - Implemented and refined the `xyz.py` module for handling XYZ file format, including reading from and writing to XYZ files with support for numpy arrays.
 - Developed unit tests for the `xyz.py` module to validate functionality, including tests for reading from XYZ files and writing to XYZ files, ensuring correct handling of atom names, positions, and file comments.
