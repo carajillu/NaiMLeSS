@@ -5,8 +5,9 @@ class Structure:
     def __init__(self):
         pass
 
-    @classmethod
-    def from_file(cls, file_path, format):
+    def from_file(self, file_path, format=None):
+        if format is None:
+            format = file_path.split(".")[-1]
         if format not in format_modules:
             raise ValueError(f"Unsupported file format: {format}")
 
@@ -18,11 +19,10 @@ class Structure:
                 f"Expected from_file to return a dictionary, got {type(str_dic)}"
             )
 
-        instance = cls()
         for key, value in str_dic.items():
-            setattr(instance, key, value)
+            setattr(self, key, value)
 
-        return instance
+        return
 
     def to_file(self, file_path, format):
         if format not in format_modules:
