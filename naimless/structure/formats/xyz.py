@@ -1,3 +1,4 @@
+from icecream import ic  # noqa: F401
 import numpy as np
 
 
@@ -54,12 +55,12 @@ def from_file(file_path):
                 frames.append(positions_current)
 
             # Convert frames to a suitable numpy array
-            frames_array = np.array(frames, dtype=float)
+
         return {
-            "crd": frames_array,
-            "atom_names": atom_names,
+            "crd": np.array(frames, dtype=float),
+            "atom_names": np.array(atom_names, dtype=str),
             "n_atoms": n_atoms,
-            "xyz_comments": comments,
+            "xyz_comments": np.array(comments, dtype=str),
         }
     except FileNotFoundError:
         raise FileNotFoundError(f"XYZ file not found: {file_path}")
