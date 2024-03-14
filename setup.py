@@ -19,9 +19,9 @@ setup(
     entry_points={
         # make the scripts available as command line scripts
         "console_scripts": [
-            "naimless = naimless.scripts.run:main",
+            "naimless = naimless.naimless:main",
         ]
     },
-    install_requires=["numpy", "pandas", "simple_slurm", "nequip"],
+    install_requires=["numpy", "pandas"],
     zip_safe=True,
 )
