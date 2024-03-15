@@ -21,7 +21,7 @@ def get_module(module_name, module_type=None):
 
 
 class HPC:
-    def __init__(self, template_path, scheduler_name, max_jobs, max_proc_job):
+    def __init__(self, username, template_path, scheduler_name, max_jobs, max_proc_job):
         """
         Initialize the HPC class with job submission configurations.
 
@@ -30,12 +30,13 @@ class HPC:
             scheduler (str): Name of the HPC job scheduler (e.g., 'slurm').
             max_jobs (int): Maximum number of concurrent jobs allowed.
         """
+        self.username = username
         self.template_path = template_path
         self.scheduler_obj = self.get_scheduler(
             scheduler_name, template_path
         )  # name of the scheduler
-        # self.max_jobs = max_jobs # max jobs that can be queued at the same time (Q+R)
-        # self.max_proc_job=max_proc_job # maximum concurrent processes in a single job
+        self.max_jobs = max_jobs  # max jobs that can be queued at the same time (Q+R)
+        self.max_proc_job = max_proc_job  # maximum concurrent processes in a single job
         # self.current_jobs = 0  # Track the number of jobs submitted
 
     def get_scheduler(self, scheduler_name, template_path):

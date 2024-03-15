@@ -71,6 +71,11 @@ class NaiMLeSS:
     def validate_config(self, config):
         """Validates the loaded configuration for QM package settings."""
 
+        self.iterations = config.get("iterations")
+        if self.iterations is None:
+            self.iterations = 1
+
+        hpc = get_module("hpc")
         # Validate initial structure file specification
         # Attempt to load the initial structure file using the Structure class
         structure = get_module("structure")
@@ -88,6 +93,66 @@ class NaiMLeSS:
 
         # Validate QM configuration
         # create an instance of the QM class
+        qm = get_module("qm")
+        qm_settings = config.get("qm_settings")
+        if qm_settings is None:
+            raise ValueError(
+                "Configuration must include a 'qm_settings' section specifying the settings of ab initio calculations."
+            )
+        try:
+            engine_name = qm_settings.get("engine_name")
+            qm_class = qm.get_qm_class(engine_name)
+
+            # A qm_obj is ALWAYS initialised with 'executable_path', 'work_path', and 'input_template'
+            qm_executable_path = qm_settings.get("executable_path")
+            qm_work_path = qm_settings.get("work_path")
+            qm_input_template = qm_settings.get("input_template")
+            qm_calculation_type = qm_settings.get("calculation_type")
+            qm_structure_filename = qm_settings.get("structure_filename")
+            # HPC config for qm object
+            qm_hpc_config = qm_settings.get("hpc_settings")
+            if qm_hpc_config is not None:
+                qm_scheduler = qm_hpc_config.get("scheduler")
+                qm_script_template = qm_hpc_config.get("script_template")
+                qm_username = qm_hpc_config.get("username")
+                if (
+                    (qm_scheduler is None)
+                    or (qm_script_template is None)
+                    or (qm_username is None)
+                ):
+                    raise ValueError("HPC configuration for QM is incomplete")
+                qm_max_jobs = qm_hpc_config.get("max_jobs")
+                if qm_max_jobs is None:
+                    qm_max_jobs = 10
+                qm_max_proc_per_job = qm_hpc_config.get("max_proc_per_job")
+                if qm_max_proc_per_job is None:
+                    qm_max_proc_per_job = 10
+                hpc_obj = hpc.HPC(
+                    qm_username,
+                    qm_script_template,
+                    qm_scheduler,
+                    qm_max_jobs,
+                    qm_max_proc_per_job,
+                )
+
+            self.qm_obj = qm_class(
+                qm_executable_path,
+                qm_work_path,
+                qm_input_template,
+                qm_calculation_type,
+                qm_structure_filename,
+                hpc_obj=hpc_obj,
+            )
+            self.qm_obj.setup_calculation_list(self.structure_obj)
+
+        except Exception as e:
+            raise ValueError(f"Failed to generate the QM object: {e}")
+
+    def run_protocol(self):
+        for _ in range(self.iterations):
+            self.qm_obj.run_calculation()
+        pass
+        # write the protocol as you devise in
 
 
 def parse_args() -> argparse.Namespace:
@@ -107,8 +172,12 @@ def main():
     args = parse_args()
     config_path = args.input
     naimless_obj = NaiMLeSS(config_path)
-    ic(vars(naimless_obj))
-    ic(vars(naimless_obj.structure_obj))
+    # ic(vars(naimless_obj))
+    # ic(vars(naimless_obj.structure_obj))
+    # ic(vars(naimless_obj.qm_obj))
+    root_path = Path.cwd()
+
+    naimless_obj.run_protocol()
     return
 
 

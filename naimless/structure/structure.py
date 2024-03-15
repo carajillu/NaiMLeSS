@@ -1,7 +1,7 @@
 # from . import format_name_modules
 import argparse
 import importlib.util
-from icecream import ic
+from icecream import ic  # noqa F402
 from pathlib import Path
 
 
@@ -30,29 +30,22 @@ class Structure:
         if format_name is None:
             format_name = file_path.split(".")[-1]
         module = get_module(format_name, "formats")
+        class_name = format_name.upper()
         try:
-            str_dic = module.from_file(file_path)
+            str_class = getattr(module, class_name)
+            self.str_obj = str_class()
+            self.str_obj.from_file(file_path)
         except AttributeError:
             raise AttributeError(
                 f"The module '{format_name}' does not have a 'from_file' function."
             )
 
-        # Ensure str_dic is a dictionary
-        if not isinstance(str_dic, dict):
-            raise TypeError(
-                f"Expected structure.format_names.{format_name}.from_file to return a dictionary, got {type(str_dic)}"
-            )
-
-        for key, value in str_dic.items():
-            setattr(self, key, value)
-
         return
 
-    def to_file(self, file_path, format_name=None):
+    def to_file(self, file_path, index, format_name=None):
         if format_name is None:
             format_name = file_path.split(".")[-1]
-        module = self.get_format_name_module(format_name)
-        module.to_file(self, file_path)
+        self.str_obj.to_file(file_path, index)
 
 
 def parse_args() -> argparse.Namespace:
@@ -79,10 +72,7 @@ def main():
     args = parse_args()
     structure_obj = Structure()
     structure_obj.from_file(args.input)
-    ic(vars(structure_obj))
-    # structure_obj.to_file(args.output)
-    notimplementedyet = "to_file not working yet from script as structure.py does not know what arguments a certain format_name needs"
-    ic(notimplementedyet)
+    structure_obj.to_file(args.output, 0)
     return
 
 
