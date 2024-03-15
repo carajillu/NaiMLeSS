@@ -1,12 +1,26 @@
 from icecream import ic  # noqa: F401
-import sys  # noqa: F401
 import yaml
 import json
-import pkgutil
-import os
 import argparse
-import importlib  # noqa: F401
-from structure.structure import Structure
+import importlib.util
+from pathlib import Path
+
+
+def get_module(module_name, module_type=None):
+    script_directory = Path(__file__).parent
+    if module_type is None:
+        module_type = module_name
+    module_file_path = script_directory / module_type / f"{module_name}.py"
+
+    if not module_file_path.exists():
+        raise FileNotFoundError(
+            f"The module file '{module_name}.py' does not exist in the {module_type} directory."
+        )
+
+    spec = importlib.util.spec_from_file_location(module_name, str(module_file_path))
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 class NaiMLeSS:
@@ -56,51 +70,24 @@ class NaiMLeSS:
 
     def validate_config(self, config):
         """Validates the loaded configuration for QM package settings."""
-        # Dynamically list all modules/packages in the 'qm' package
-        qm_modules = [
-            module.name
-            for module in pkgutil.iter_modules(
-                [os.path.join(os.path.dirname(__file__), "qm")]
-            )
-        ]
-
-        # Check for QM package specification
-        if "qm_package" not in config:
-            raise ValueError("Configuration must specify a 'qm_package'.")
-
-        qm_package = config["qm_package"]
-
-        # Check if the specified QM package is supported
-        if qm_package not in qm_modules:
-            raise ValueError(
-                f"QM package '{qm_package}' is not supported. Supported packages: {', '.join(qm_modules)}"
-            )
-
-        # Check for the settings of the specified QM package
-        if "qm_settings" not in config or qm_package not in config["qm_settings"]:
-            raise ValueError(
-                f"Missing required settings for the QM package '{qm_package}'."
-            )
 
         # Validate initial structure file specification
-        # Validate initial structure file specification
-        try:
-            structure_path = config["initial_structure"]
-        except KeyError as e:
-            missing_key = str(e).strip(
-                "'"
-            )  # Format the KeyError string to extract the key name
-            raise ValueError(
-                f"Configuration must include '{missing_key}' specifying the path to the initial structure file."
-            )
-
         # Attempt to load the initial structure file using the Structure class
+        structure = get_module("structure")
+        structure_path = config.get("initial_structure")
+        if structure_path is None:
+            raise ValueError(
+                "Configuration must include 'initial_structure' specifying the path to the initial structure file."
+            )
         try:
-            self.structure_obj = Structure()
+            self.structure_obj = structure.Structure()
             self.structure_obj.from_file(structure_path)
         except Exception as e:
             # Handle potential errors raised by Structure.from_file
             raise ValueError(f"Failed to load the initial structure file: {e}")
+
+        # Validate QM configuration
+        # create an instance of the QM class
 
 
 def parse_args() -> argparse.Namespace:
@@ -120,6 +107,9 @@ def main():
     args = parse_args()
     config_path = args.input
     naimless_obj = NaiMLeSS(config_path)
+    ic(vars(naimless_obj))
+    ic(vars(naimless_obj.structure_obj))
+    return
 
 
 if __name__ == "__main__":
