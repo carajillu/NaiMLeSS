@@ -73,7 +73,7 @@ def to_file(
     atom_names: list[str],
     crd: np.array,
     output: str,
-    format=None,
+    index=None,
 ):
     """
     Writes atomic coordinates, atom names, and a comment to an XYZ file.
@@ -89,13 +89,21 @@ def to_file(
     - AssertionError: If the shape of the coordinates array does not match (n_atoms, 3).
     """
     assert crd.shape == (len(crd), n_atoms, 3), "Invalid coordinate shape"
-    assert comments.shape == (len(crd)), "Invalid coordinate shape"
+    assert comments.ndim == (len(crd)), "Invalid coordinate shape"
 
-    if format is None:
-        format = output.split(".")[-1]
+    if index is None:
+        index = range(len(crd))
+    elif type(index) is int:
+        index = [index]
+    elif type[index] is list[int] or (
+        type(index) is np.array(dtype=int) and index.ndim == 1
+    ):
+        pass
+    else:
+        raise TypeError("index seems to be incorrectly formatted")
 
     with open(output, "w") as f:
-        for i in range(len(crd)):
+        for i in index:
             f.write(f"{n_atoms}\n")
             f.write(comments[i] + "\n")
             for atom in range(n_atoms):
