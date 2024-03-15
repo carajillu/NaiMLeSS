@@ -1,5 +1,6 @@
 from icecream import ic  # noqa: F401
 import numpy as np
+import argparse
 
 
 def from_file(file_path):
@@ -67,7 +68,12 @@ def from_file(file_path):
 
 
 def to_file(
-    n_atoms: int, comment: str, atom_names: list[str], crd: np.array, output: str
+    n_atoms: int,
+    comments: str,
+    atom_names: list[str],
+    crd: np.array,
+    output: str,
+    format=None,
 ):
     """
     Writes atomic coordinates, atom names, and a comment to an XYZ file.
@@ -82,12 +88,54 @@ def to_file(
     Raises:
     - AssertionError: If the shape of the coordinates array does not match (n_atoms, 3).
     """
-    assert crd.shape == (n_atoms, 3), "Invalid coordinate shape"
+    assert crd.shape == (len(crd), n_atoms, 3), "Invalid coordinate shape"
+    assert comments.shape == (len(crd)), "Invalid coordinate shape"
+
+    if format is None:
+        format = output.split(".")[-1]
 
     with open(output, "w") as f:
-        f.write(f"{n_atoms}\n")
-        f.write(comment + "\n")
-        for atom in range(n_atoms):
-            f.write(
-                f"{atom_names[atom]} {crd[atom, 0]:.6f} {crd[atom, 1]:.6f} {crd[atom, 2]:.6f}\n"
-            )
+        for i in range(len(crd)):
+            f.write(f"{n_atoms}\n")
+            f.write(comments[i] + "\n")
+            for atom in range(n_atoms):
+                f.write(
+                    f"{atom_names[atom]} {crd[i][atom, 0]:.6f} {crd[i][atom, 1]:.6f} {crd[i][atom, 2]:.6f}\n"
+                )
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-i",
+        "--input",
+        nargs="?",
+        help="input structure file",
+        default="molecule_in.xyz",
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        nargs="?",
+        help="input structure file",
+        default="molecule_out.xyz",
+    )
+    args = parser.parse_args()
+    return args
+
+
+def main():
+    args = parse_args()
+    structure_dic = ic(from_file(args.input))
+    to_file(
+        structure_dic["n_atoms"],
+        structure_dic["xyz_comments"],
+        structure_dic["atom_names"],
+        structure_dic["crd"],
+        args.output,
+    )
+    return
+
+
+if __name__ == "__main__":
+    main()
