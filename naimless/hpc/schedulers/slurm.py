@@ -26,7 +26,7 @@ class Scheduler:
                     else:
                         self.modules.append(line)
 
-    def add_command_to_template(self, cmd_list, output_script):
+    def add_command_to_template(self, job_name, cmd_list, output_script):
         with open(output_script, "w") as f:
             for key, value in vars(self).items():
                 if key == "interpreter":
@@ -34,6 +34,9 @@ class Scheduler:
                 elif key == "modules":
                     for module in value:
                         f.write(module)
+                elif key == "job-name":
+                    line = f"#SBATCH --job-name={job_name}\n"
+                    f.write(line)
                 else:
                     line = f"#SBATCH --{key}={value}\n"
                     f.write(line)
