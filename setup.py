@@ -22,6 +22,6 @@ setup(
             "naimless = naimless.naimless:main",
         ]
     },
-    install_requires=["numpy", "pandas", "ase"],
+    install_requires=["numpy", "pandas", "ase", "icecream"],
     zip_safe=True,
 )
