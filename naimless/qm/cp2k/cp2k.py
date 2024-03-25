@@ -135,8 +135,8 @@ class CP2K:
                     self.hpc_obj.username
                 )
                 while job_count > self.hpc_obj.max_jobs:
-                    print("Maximum jobs in the queue achieved. Waiting 60 seconds")
-                    time.sleep(60)
+                    # print(F"{job_count} jobs in the queue. Waiting 1 seconds")
+                    time.sleep(1)
                     job_count = self.hpc_obj.scheduler_obj.count_user_jobs(
                         self.hpc_obj.username
                     )
