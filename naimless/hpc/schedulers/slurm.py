@@ -14,7 +14,7 @@ class Scheduler:
         with open(template_path, "r") as file:
             for line in file:
                 if line.startswith("#!"):
-                    setattr(self, "interpreter", line)
+                    setattr(self, "interpreter", line.strip("\n"))
                 elif line.startswith("#SBATCH"):
                     line = line.split()
                     directive_name = line[1].split("=")[0].strip("--")
@@ -22,16 +22,21 @@ class Scheduler:
                     setattr(self, directive_name, directive_value)
                 elif "module " in line:
                     if not hasattr(self, "modules"):
-                        setattr(self, "modules", [])
+                        setattr(self, "modules", [line.strip("\n")])
                     else:
                         self.modules.append(line)
+                elif "export " in line:
+                    if not hasattr(self, "exports"):
+                        setattr(self, "exports", [line.strip("\n")])
+                    else:
+                        self.exports.append(line)
 
     def add_command_to_template(self, job_name, cmd_list, output_script):
         with open(output_script, "w") as f:
             for key, value in vars(self).items():
                 if key == "interpreter":
                     f.write(value)
-                elif key == "modules":
+                elif key == "modules" or key == "exports":
                     for module in value:
                         f.write(module)
                 elif key == "job-name":
