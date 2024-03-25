@@ -14,7 +14,7 @@ class Scheduler:
         with open(template_path, "r") as file:
             for line in file:
                 if line.startswith("#!"):
-                    setattr(self, "interpreter", line.strip("\n"))
+                    setattr(self, "interpreter", line)
                 elif line.startswith("#SBATCH"):
                     line = line.split()
                     directive_name = line[1].split("=")[0].strip("--")
@@ -22,12 +22,12 @@ class Scheduler:
                     setattr(self, directive_name, directive_value)
                 elif "module " in line:
                     if not hasattr(self, "modules"):
-                        setattr(self, "modules", [line.strip("\n")])
+                        setattr(self, "modules", [line])
                     else:
                         self.modules.append(line)
                 elif "export " in line:
                     if not hasattr(self, "exports"):
-                        setattr(self, "exports", [line.strip("\n")])
+                        setattr(self, "exports", [line])
                     else:
                         self.exports.append(line)
 
