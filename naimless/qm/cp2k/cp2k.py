@@ -92,15 +92,15 @@ class CP2K:
         exec_cmd = f"{self.executable_path} -i {self.input_template} -o {self.input_template}.stdout"
 
         # Remove the calculations that ran succesfuly from the list
-        for i in range(len(self.calc_paths)):
+        for i in reversed(range(len(self.calc_paths))):
             calc_path = self.calc_paths[i]
             if Path(f"{calc_path}/{self.input_template}.stdout").exists():
                 with open(f"{calc_path / self.input_template}.stdout", "r") as f:
                     if "PROGRAM ENDED AT" in f.read():
                         msg = f"Calculation in {calc_path} seems to be already run correctly. Removing from queue."
-                        self.calc_paths = np.delete(self.calc_paths, calc_path)
+                        self.calc_paths = np.delete(self.calc_paths, i)
                         print(msg)
-                        
+
         if self.hpc_obj is None:
             for i in range(len(self.calc_paths)):
                 calc_path = self.calc_paths[i]
@@ -120,6 +120,7 @@ class CP2K:
             for i in range(len(hpc_paths)):
                 output_name = "sbatch_" + str(i).zfill(3) + ".sh"
                 output_script = self.work_path / output_name
+                job_name = f"qm_{i}"
                 hpc_procs = []
                 for path in hpc_paths[i]:
                     hpc_procs.append(f"cd {path}")
@@ -128,7 +129,7 @@ class CP2K:
                 hpc_procs.append("wait")
 
                 self.hpc_obj.scheduler_obj.add_command_to_template(
-                    hpc_procs, output_script
+                    job_name, hpc_procs, output_script
                 )
                 job_count = self.hpc_obj.scheduler_obj.count_user_jobs(
                     self.hpc_obj.username
