@@ -59,7 +59,7 @@ class CP2K:
         setattr(self, "parse_output", calc_module.parse_output)
 
     def setup_calculation_list(self, structure_obj):
-        for i in range(structure_obj.str_obj.n_frames):
+        for i in range(len(structure_obj)):
             self.calc_paths.append(
                 self.prepare_input(
                     self.work_path,
@@ -90,31 +90,33 @@ class CP2K:
         returns an array with the directory names of the calculations that finished successfully
         """
         exec_cmd = f"{self.executable_path} -i {self.input_template} -o {self.input_template}.stdout"
-        successful_calcs = []
+
+        # Remove the calculations that ran succesfuly from the list
+        for i in range(len(self.calc_paths)):
+            calc_path = self.calc_paths[i]
+            if Path(f"{calc_path}/{self.input_template}.stdout").exists():
+                with open(f"{calc_path / self.input_template}.stdout", "r") as f:
+                    if "PROGRAM ENDED AT" in f.read():
+                        msg = f"Calculation in {calc_path} seems to be already run correctly. Removing from queue."
+                        self.calc_paths = np.delete(self.calc_paths, calc_path)
+                        print(msg)
+                        
         if self.hpc_obj is None:
             for i in range(len(self.calc_paths)):
                 calc_path = self.calc_paths[i]
                 os.chdir(self.calc_paths[i])
-                if Path(f"{calc_path}/{self.input_template}.stdout").exists():
-                    with open(f"{calc_path / self.input_template}.stdout", "r") as f:
-                        if "PROGRAM ENDED AT" in f.read():
-                            successful_calcs.append(i)
-                            msg = f"Calculation in {calc_path} seems to be already run correctly. Skipping."  # noqa F402
-                            # ic(msg)
-                else:
-                    try:
-                        # subprocess.run(exec_cmd[i], shell=True, check=True)
-                        mock = f"Running command {exec_cmd} in {calc_path}"  # noqa F402
-                        # ic(mock)
-                        successful_calcs.append(i)
-                    except subprocess.CalledProcessError as e:
-                        self.logger.error(f"Calculation failed in {calc_path}: {e}")
+                try:
+                    msg = f"Running command {exec_cmd} in {calc_path}"  # noqa F402
+                    print(msg)
+                    subprocess.run(exec_cmd[i], shell=True, check=True)
+                    self.calc_paths = np.delete(self.calc_paths, calc_path)
+                except subprocess.CalledProcessError as e:
+                    self.logger.error(f"Calculation failed in {calc_path}: {e}")
                 os.chdir(self.work_path)
         else:
-            hpc_paths = [
-                self.calc_paths[i : i + self.hpc_obj.max_proc_job]
-                for i in range(0, len(self.calc_paths), self.hpc_obj.max_proc_job)
-            ]
+            hpc_paths = []
+            for i in range(0, len(self.calc_paths), self.hpc_obj.max_proc_job):
+                hpc_paths.append(self.calc_paths[i : i + self.hpc_obj.max_proc_job])
             for i in range(len(hpc_paths)):
                 output_name = "sbatch_" + str(i).zfill(3) + ".sh"
                 output_script = self.work_path / output_name
@@ -138,8 +140,6 @@ class CP2K:
                         self.hpc_obj.username
                     )
                 self.hpc_obj.scheduler_obj.submit_to_queue(output_script)
-        # Remove the calculation paths that ran successfully from the queue
-        self.calc_paths = np.delete(self.calc_paths, successful_calcs)
 
 
 def parse_args() -> argparse.Namespace:

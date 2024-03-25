@@ -1,9 +1,11 @@
 from icecream import ic  # noqa: F401
+import sys  # noqa: F401
 import yaml
 import json
 import argparse
 import importlib.util
 from pathlib import Path
+from ase import io as ase_io
 
 
 def get_module(module_name, module_type=None):
@@ -69,24 +71,25 @@ class NaiMLeSS:
         return config
 
     def validate_config(self, config):
-        """Validates the loaded configuration for QM package settings."""
+        # 0) Load modules that will be necessary in several places down the line
+        # Load hpc module which will be used by the QM, ML and MD modules
+        hpc = get_module("hpc")
 
+        # 1) Load system configuration
         self.iterations = config.get("iterations")
         if self.iterations is None:
+            print("Number of iterations not specified. Setting it to 1.")
             self.iterations = 1
 
-        hpc = get_module("hpc")
-        # Validate initial structure file specification
-        # Attempt to load the initial structure file using the Structure class
-        structure = get_module("structure")
+        # Attempt to load the initial structure file using ase.io.read
         structure_path = config.get("initial_structure")
         if structure_path is None:
             raise ValueError(
                 "Configuration must include 'initial_structure' specifying the path to the initial structure file."
             )
         try:
-            self.structure_obj = structure.Structure()
-            self.structure_obj.from_file(structure_path)
+            print(f"Attempting to load the structure file: {structure_path}")
+            self.structure_obj = ase_io.read(structure_path, index=":")
         except Exception as e:
             # Handle potential errors raised by Structure.from_file
             raise ValueError(f"Failed to load the initial structure file: {e}")
@@ -103,7 +106,6 @@ class NaiMLeSS:
             engine_name = qm_settings.get("engine_name")
             qm_class = qm.get_qm_class(engine_name)
 
-            # A qm_obj is ALWAYS initialised with 'executable_path', 'work_path', and 'input_template'
             qm_executable_path = qm_settings.get("executable_path")
             qm_work_path = qm_settings.get("work_path")
             qm_input_template = qm_settings.get("input_template")
@@ -175,7 +177,7 @@ def main():
     # ic(vars(naimless_obj))
     # ic(vars(naimless_obj.structure_obj))
     # ic(vars(naimless_obj.qm_obj))
-    root_path = Path.cwd()
+    # root_path = Path.cwd()
 
     naimless_obj.run_protocol()
     return

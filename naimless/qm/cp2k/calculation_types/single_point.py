@@ -1,6 +1,7 @@
 from icecream import ic  # noqa F402
 from pathlib import Path
 import shutil
+from ase import io as ase_io
 
 
 def prepare_input(
@@ -37,7 +38,7 @@ def prepare_input(
 
     # Write the output file using structure_obj.to_file() in the calculation directory
     structure_frame_path = calculation_path / structure_frame_filename
-    structure_obj.to_file(str(structure_frame_path), frame_index)
+    ase_io.write(structure_frame_path, structure_obj[frame_index])
 
     return calculation_dir
 
