@@ -111,6 +111,8 @@ class NaiMLeSS:
             qm_input_template = qm_settings.get("input_template")
             qm_calculation_type = qm_settings.get("calculation_type")
             qm_structure_filename = qm_settings.get("structure_filename")
+            qm_descriptors = qm_settings.get("descriptors")
+
             # HPC config for qm object
             qm_hpc_config = qm_settings.get("hpc_settings")
             if qm_hpc_config is not None:
@@ -145,13 +147,13 @@ class NaiMLeSS:
                 qm_structure_filename,
                 hpc_obj=hpc_obj,
             )
-            self.qm_obj.setup_calculation_list(self.structure_obj)
 
         except Exception as e:
             raise ValueError(f"Failed to generate the QM object: {e}")
 
     def run_protocol(self):
         for _ in range(self.iterations):
+            self.qm_obj.setup_calculation_list(self.qm_obj, self.structure_obj)
             self.qm_obj.run_calculation()
         pass
         # write the protocol as you devise in

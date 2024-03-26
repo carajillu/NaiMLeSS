@@ -3,6 +3,10 @@ from pathlib import Path
 import shutil
 from ase import io as ase_io
 
+"""
+The functions within this module are meant to be set as attributes of the CP2K class.
+"""
+
 
 def prepare_input(
     qm_work_path,
@@ -43,5 +47,29 @@ def prepare_input(
     return calculation_dir
 
 
-def parse_output():
+def setup_calculation_list(self, structure_obj):
+    self.calc_paths = []
+    for i in range(len(structure_obj)):
+        self.calc_paths.append(
+            prepare_input(
+                self.work_path,
+                self.input_template,
+                i,
+                structure_obj,
+                self.structure_filename,
+            )
+        )
+
+
+def parse_output(descriptors):
+    for key in descriptors.keys():
+        # return the value of the function that matches f"parse_key"
+        globals()[f"parse_{key}"]()
+
+
+def parse_E():
+    pass
+
+
+def parse_F():
     pass

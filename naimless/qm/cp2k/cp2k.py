@@ -42,8 +42,8 @@ class CP2K:
         self.work_path = self.create_work_dir(work_path)
         self.calculation_type = calculation_type
         self.hpc_obj = hpc_obj
-        self.calc_paths = []
-        # self.default_params = default_params if default_params is not None else {}
+        # self.calc_paths = []
+
         # Set up logging
         self.logger = logging.getLogger(__name__)
         self.setup_functions()
@@ -57,22 +57,7 @@ class CP2K:
         calc_module = get_module(self.calculation_type, "calculation_types")
         setattr(self, "prepare_input", calc_module.prepare_input)
         setattr(self, "parse_output", calc_module.parse_output)
-
-    def setup_calculation_list(self, structure_obj):
-        for i in range(len(structure_obj)):
-            self.calc_paths.append(
-                self.prepare_input(
-                    self.work_path,
-                    self.input_template,
-                    i,
-                    structure_obj,
-                    self.structure_filename,
-                )
-            )
-        self.calc_paths = np.array(self.calc_paths)
-
-    def update_calculation_list():
-        pass
+        setattr(self, "setup_calculation_list", calc_module.setup_calculation_list)
 
     def run_calculation(self):
         """
